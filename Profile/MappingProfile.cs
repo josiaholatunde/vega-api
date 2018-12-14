@@ -11,6 +11,8 @@ namespace VegaAPI.Profile
         {
             CreateMap<Make, MakeResource>();
             CreateMap<Model, KeyValuePairResource>();
+            CreateMap<Feature, KeyValuePairResource>();
+            CreateMap<FilterResource, Filter>();
             CreateMap<Vehicle, SaveVehicleResource>()
             .ForMember(vr => vr.Contact, opt => opt.MapFrom(v => new ContactResource{ Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone}))
             .ForMember( vr => vr.VehicleFeatures, opt => opt.MapFrom( v => v.VehicleFeatures.Select(vf => vf.FeatureId)));
@@ -21,7 +23,7 @@ namespace VegaAPI.Profile
 
             // Map API Resource to Domain Resource
             CreateMap<SaveVehicleResource, Vehicle>()
-            .ForMember(v => v.Id, opt => opt.Ignore())
+            .ForMember(v => v.Id, opt => opt.Ignore()) 
             .ForMember(v => v.ContactName, opt => opt.MapFrom(vr => vr.Contact.Name))
             .ForMember(v => v.ContactEmail, opt => opt.MapFrom(vr => vr.Contact.Email))
             .ForMember(v => v.ContactPhone, opt => opt.MapFrom(vr => vr.Contact.Phone))

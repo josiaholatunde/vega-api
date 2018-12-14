@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Vehicle } from 'Models/Vehicle';
+import { FilterResource } from '../Models/FilterResource';
 
 
 const httpOptions = {
@@ -27,7 +28,19 @@ export class VehicleService {
   deleteVehicle(id: number) {
     return this.http.delete(`${this.url}/${id}`).pipe();
   }
-  getVehicles(): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(this.url).pipe();
+  getVehicles(filter: FilterResource): Observable<Vehicle[]> {
+    return this.http.get<Vehicle[]>(`${this.url}?${this.toQueryString(filter)}`).pipe();
+  }
+  toQueryString(filter) {
+    const params = [];
+    filter.forEach(f => {
+      const value = filter[f];
+      if (value ) {
+        const res = `${encodeURIComponent(filter)}=${encodeURIComponent(value)}`;
+        params.push(res);
+      }
+    });
+    console.log(params.join('&'));
+
   }
 }

@@ -16,7 +16,6 @@ namespace VegaAPI.Models
         public Model()
         {
             Vehicles = new Collection<Vehicle>();
-            
         }
     }
     

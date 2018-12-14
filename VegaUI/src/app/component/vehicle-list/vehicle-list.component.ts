@@ -20,13 +20,16 @@ export class VehicleListComponent implements OnInit {
 
   ngOnInit() {
     this.makesService.getMakes().subscribe(makes => this.makes = makes);
-    this.vehicleService.getVehicles().subscribe(vehicles => {
+    this.populateModels();
+  }
+  populateModels() {
+    this.vehicleService.getVehicles(this.filter).subscribe(vehicles => {
       this.vehicles = this.allVehicles = <Vehicle[]>vehicles;
     });
   }
   getVehicles() {
   }
-  onFilterChange() {
+  onFilterChangeClient() {
     let vehicles = this.allVehicles;
     if (this.filter.makeId) {
       vehicles = vehicles.filter(v => v.make.id == this.filter.makeId);
@@ -35,6 +38,9 @@ export class VehicleListComponent implements OnInit {
       vehicles = vehicles.filter(v => v.model.id == this.filter.modelId);
     }
     this.vehicles = vehicles;
+  }
+  onFilterChange() {
+    this.populateModels();
   }
   reset() {
     this.filter = {};

@@ -8,8 +8,9 @@ namespace VegaAPI.Controllers.Resource
     public class VehicleResource
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public KeyValuePairResource Model { get; set; }
-        public MakeResource Make {get;set;}
+        public KeyValuePairResource Make {get;set;}
         public bool IsRegistered { get; set; }
         public DateTime LastUpdated { get; set; }
         public ContactResource Contact { get; set; }

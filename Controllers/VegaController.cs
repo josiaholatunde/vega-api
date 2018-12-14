@@ -8,6 +8,7 @@ using VegaAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using VegaAPI.Controllers.Resource;
 using AutoMapper;
+using VegaAPI.Core;
 
 namespace VegaAPI.Controllers
 {
@@ -17,35 +18,35 @@ namespace VegaAPI.Controllers
     {
         private readonly VegaContext _context;
         private readonly IMapper _mapper;
+        private readonly IVehicleRepository _repository;
 
-        public VegaController(VegaContext context, IMapper mapper)
+        public VegaController(VegaContext context, IMapper mapper, IVehicleRepository repository)
         {
             _context = context;
             _mapper = mapper;
+            _repository = repository;
         }
         // GET api/values
-        [HttpGet("makes")]
-        public async Task<IEnumerable<MakeResource>> GetMakes()
+        [HttpGet("features")]
+        public async Task<IEnumerable<KeyValuePairResource>> GetFeatures()
         {
-           var makes = await _context.Makes.Include(m => m.Models).ToListAsync();
-            return _mapper.Map<List<Make>, List<MakeResource>>(makes);
+           var features = await _repository.GetFeatures();
+            return _mapper.Map<IEnumerable<Feature>, IEnumerable<KeyValuePairResource>>(features);
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+         [HttpGet("makes")]
+        public async Task<IEnumerable<MakeResource>> GetMakes()
         {
-            return "value";
+           var makes = await _repository.GetMakes();
+            return _mapper.Map<IEnumerable<Make>, IEnumerable<MakeResource>>(makes);
         }
+
         [HttpGet("vehicles")]
-        public async Task<IEnumerable<VehicleResource>> GetVehicles()
+        public async Task<IEnumerable<VehicleResource>> GetVehicles([FromQuery] FilterResource filterResource)
         {
-           var vehicles = await _context.Vehicles
-                                .Include(v => v.VehicleFeatures)
-                                    .ThenInclude(vf => vf.Feature)
-                                .Include(v => v.Model)
-                                .ToListAsync();
-            return _mapper.Map<List<Vehicle>, List<VehicleResource>>(vehicles);
+          var filter =  _mapper.Map<FilterResource, Filter>(filterResource);
+           var vehicles = await _repository.GetVehicles(filter);
+           return _mapper.Map<IEnumerable<Vehicle>, IEnumerable<VehicleResource>>(vehicles);
         }
 
         [HttpGet("vehicles/{id}")]
@@ -53,12 +54,7 @@ namespace VegaAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            var vehicle = await _context.Vehicles
-                                    .Include(v => v.VehicleFeatures)
-                                        .ThenInclude(vf => vf.Feature)
-                                    .Include(v => v.Model)
-                                        .ThenInclude(vr => vr.Make)
-                                    .SingleOrDefaultAsync( vf => vf.Id == id);
+            var vehicle = await _repository.GetVehicle(id);
             if (vehicle == null)
                 return NotFound("Vehicle Not Found");
             var result =  _mapper.Map<Vehicle, VehicleResource>(vehicle);
@@ -67,26 +63,30 @@ namespace VegaAPI.Controllers
 
         // POST api/values
         [HttpPost("vehicles")]
-        public  IActionResult Post([FromBody] VehicleResource vehicleResource)
+        public async Task<IActionResult> Post([FromBody] SaveVehicleResource vehicleResource)
         {
-            var res =  _mapper.Map<VehicleResource, Vehicle>(vehicleResource);
-            _context.Vehicles.Add(res);
+            var res =  _mapper.Map<SaveVehicleResource, Vehicle>(vehicleResource);
+            res.LastUpdated = DateTime.Now;
+            _repository.AddVehicle(res);
             _context.SaveChanges();
-           var result =  _mapper.Map<Vehicle, VehicleResource>(res);
+            var vehicle = await _repository.GetVehicle(res.Id);
+           var result =  _mapper.Map<Vehicle, VehicleResource>(vehicle);
             return Ok(result);
         }
 
         // PUT api/values/5
         [HttpPut("vehicles/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] VehicleResource vehicleResource)
+        public async Task<IActionResult> Put(int id, [FromBody] SaveVehicleResource vehicleResource)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            var vehicle = await _context.Vehicles.Include(v => v.VehicleFeatures).SingleOrDefaultAsync( vf => vf.Id == id);
+            var vehicle = await _repository.GetVehicle(id);
             if (vehicle == null)
                 return NotFound();
-            var res =  _mapper.Map<VehicleResource, Vehicle>(vehicleResource,vehicle);
+            var res =  _mapper.Map<SaveVehicleResource, Vehicle>(vehicleResource,vehicle);
+            res.LastUpdated = DateTime.Now;
             await _context.SaveChangesAsync();
+            await _repository.GetVehicle(res.Id);
             var result =  _mapper.Map<Vehicle, VehicleResource>(res);
             return Ok(result);
         }
@@ -97,10 +97,10 @@ namespace VegaAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            var vehicle = await _context.Vehicles.FindAsync(id);
+            var vehicle = await _repository.GetVehicle(id, false);
             if (vehicle == null)
                 return NotFound();
-            _context.Remove(vehicle);
+             _repository.RemoveVehicle(vehicle);
             await _context.SaveChangesAsync();
             return Ok(id);
 
