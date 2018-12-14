@@ -1,3 +1,4 @@
+import { SaveVehicle } from 'src/app/Models/SaveVehicle';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -19,5 +20,14 @@ export class VehicleService {
   }
   getVehicle(id: number): Observable<Vehicle> {
     return this.http.get(`${this.url}/${id}`).pipe();
+  }
+  updateVehicle(vehicle: SaveVehicle) {
+    return this.http.put(`${this.url}/${vehicle.id}`, vehicle, httpOptions).pipe();
+  }
+  deleteVehicle(id: number) {
+    return this.http.delete(`${this.url}/${id}`).pipe();
+  }
+  getVehicles(): Observable<Vehicle[]> {
+    return this.http.get<Vehicle[]>(this.url).pipe();
   }
 }

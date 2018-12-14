@@ -39,7 +39,10 @@ export class VehicleFormComponent implements OnInit {
     this.featuresService.getFeatures().subscribe(features => this.features = features);
     if (this.vehicle.id) {
       this.vehicleService.getVehicle(this.vehicle.id).subscribe(
-        (vehicle: Vehicle) => this.setVehicle(vehicle),
+        (vehicle: Vehicle) => {
+          this.setVehicle(vehicle);
+          this.populateModels();
+        },
         err => {
           if (err.status === 404) {
             this.router.navigate(['not-found']);
@@ -55,9 +58,12 @@ export class VehicleFormComponent implements OnInit {
     this.vehicle.vehicleFeatures = _.pluck(vehicle.vehicleFeatures, 'id');
   }
   updateModel() {
+    this.populateModels();
+    delete this.vehicle.modelId;
+  }
+  populateModels() {
     const selectedMake = this.makes.find(m => +m.id === +this.vehicle.makeId);
     this.models = selectedMake ? selectedMake.models : [];
-    delete this.vehicle.modelId;
   }
 
   updateFeatures() {
@@ -72,7 +78,18 @@ export class VehicleFormComponent implements OnInit {
     }
   }
   submitForm() {
-    this.vehicleService.createVehicle(this.vehicle).subscribe( vehicle => console.log(vehicle));
+    if (this.vehicle.id) {
+      this.vehicleService.updateVehicle(this.vehicle).subscribe(vehicle => this.vehicle = <SaveVehicle>vehicle);
+    } else {
+      this.vehicleService.createVehicle(this.vehicle).subscribe( vehicle => console.log(vehicle));
+    }
+  }
+  deleteVehicle() {
+    if (confirm('Are you sure you want to delete this vehicle? ')) {
+      this.vehicleService.deleteVehicle(this.vehicle.id).subscribe(id => {
+        this.router.navigate(['vehicles']);
+      });
+    }
   }
 
 }

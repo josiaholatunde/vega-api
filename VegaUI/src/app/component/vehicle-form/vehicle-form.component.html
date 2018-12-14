@@ -1,4 +1,4 @@
-<div class="container card col-md-5">
+<div class="container card col-md-7">
   <form #formControl="ngForm" (ngSubmit)="submitForm()">
       <div>
           <h3>Order for a Vehicle</h3>
@@ -23,16 +23,16 @@
         </div>
         <p>Is this vehicle registered? </p>
           <label for="registered" class="radio-inline">
-            <input type="radio" name="isRegistered" id="registered" value="true" [(ngModel)]="vehicle.isRegistered"> Yes
+            <input type="radio" name="isRegistered" id="registered" [value]="true" [(ngModel)]="vehicle.isRegistered"> Yes
           </label>
             <label for="notRegistered" class="radio-inline">
-              <input type="radio" name="isRegistered" id="notRegistered" value="false" [(ngModel)]="vehicle.isRegistered"> No
+              <input type="radio" name="isRegistered" id="notRegistered" [value]="false" [(ngModel)]="vehicle.isRegistered"> No
             </label>
         <div class="form-group" *ngIf="features.length > 0">
           <h3>Features</h3>
           <div *ngFor="let feature of features">
 
-            <input type="checkbox" name="feature{{feature.id}}" id="feature{{feature.id}}" (change)="onFeatureChange(feature.id, $event)" value="feature{{feature.id}}" >
+            <input type="checkbox" name="feature{{feature.id}}" id="feature{{feature.id}}" [checked]="vehicle.vehicleFeatures.includes(feature.id)" (change)="onFeatureChange(feature.id, $event)" value="feature{{feature.id}}" >
             <label for="feature{{feature.id}}">{{feature.name}}</label>
           </div>
         </div>
@@ -56,6 +56,7 @@
             <div class="alert alert-danger" *ngIf="contactEmailControl.touched && contactEmailControl.invalid">The name field can not be empty</div>
           </div>
         </div>
-        <button class="btn btn-danger btn-md unique" [disabled]="formControl.invalid">Save</button>
+        <button class="btn btn-success btn-md unique" [disabled]="formControl.invalid">Save</button>
+        <button *ngIf="vehicle.id" class="btn btn-danger btn-md unique ml-3" [disabled]="formControl.invalid" (click)="deleteVehicle()">Delete</button>
   </form>
 </div>

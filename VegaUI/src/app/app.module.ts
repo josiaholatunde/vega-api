@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 import { VehicleListComponent } from './component/vehicle-list/vehicle-list.component';
 import { ComponentComponent } from './component/component.component';
 import { NotFoundComponent } from './component/not-found/not-found.component';
+import { VehicleDetailComponent } from './component/vehicle-detail/vehicle-detail.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { NotFoundComponent } from './component/not-found/not-found.component';
     NavbarComponent,
     VehicleListComponent,
     ComponentComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    VehicleDetailComponent
   ],
   imports: [
     BrowserModule,

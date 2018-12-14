@@ -1,0 +1,28 @@
+<table class="table table-striped table-bordered">
+<thead>
+    <tr>
+      <th>Name</th>
+      <th>Make</th>
+      <th>Model</th>
+      <th>Features</th>
+      <th>Contact Name</th>
+      <th>Contact Email</th>
+      <th>Action</th>
+    </tr>
+</thead>
+<tbody>
+    <tr *ngFor="let vehicle of vehiclesList">
+      <td> {{vehicle.name}} </td>
+      <td> {{vehicle.make.name}} </td>
+      <td> {{vehicle.model.name}} </td>
+      <td>
+        <ul>
+            <li *ngFor="let feature of vehicle.vehicleFeatures">{{feature.name}}</li>
+        </ul>
+      </td>
+      <td>{{vehicle.contact.name}}</td>
+      <td>{{vehicle.contact.email}}</td>
+      <td><a [routerLink]="['/vehicle',vehicle.id]" class="btn btn-danger">View</a></td>
+    </tr>
+  </tbody>
+</table>
