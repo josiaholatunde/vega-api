@@ -20,9 +20,9 @@ export class VehicleListComponent implements OnInit {
 
   ngOnInit() {
     this.makesService.getMakes().subscribe(makes => this.makes = makes);
-    this.populateModels();
+    this.populateVehicles();
   }
-  populateModels() {
+  populateVehicles() {
     this.vehicleService.getVehicles(this.filter).subscribe(vehicles => {
       this.vehicles = this.allVehicles = <Vehicle[]>vehicles;
     });
@@ -40,11 +40,20 @@ export class VehicleListComponent implements OnInit {
     this.vehicles = vehicles;
   }
   onFilterChange() {
-    this.populateModels();
+    this.populateVehicles();
   }
   reset() {
     this.filter = {};
     this.onFilterChange();
+  }
+  sortColumns(columnName: string) {
+    if (this.filter.sortBy === columnName) {
+      this.filter.isAscending = false;
+    } else {
+      this.filter.isAscending = true;
+      this.filter.sortBy = columnName;
+    }
+    this.populateVehicles();
   }
 
 }

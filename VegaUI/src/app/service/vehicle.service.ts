@@ -33,14 +33,14 @@ export class VehicleService {
   }
   toQueryString(filter) {
     const params = [];
-    filter.forEach(f => {
-      const value = filter[f];
-      if (value ) {
-        const res = `${encodeURIComponent(filter)}=${encodeURIComponent(value)}`;
+    for (const f in filter) {
+      if (f) {
+        const value = filter[f];
+        const res = `${f}=${value}`;
         params.push(res);
       }
-    });
-    console.log(params.join('&'));
+    }
+    return params.join('&');
 
   }
 }

@@ -11,7 +11,7 @@
         </div>
         <button (click)="reset()" class="btn btn-default mb-3">Reset</button>
   </div>
-  <app-vehicle-detail [vehiclesList]="vehicles"></app-vehicle-detail>
+  <app-vehicle-detail [vehiclesList]="vehicles" (sortChanged)="sortColumns($event)"></app-vehicle-detail>
 </div>
 
 
